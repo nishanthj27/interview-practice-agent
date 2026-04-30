@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Interview - Interview Practice Partner</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="interview-body voice-body">
+<div class="interview-container">
+    <header class="interview-header">
+        <div class="header-left">
+            <button class="back-btn" onclick="goBack()">← Back</button>
+            <div class="job-info">
+                <h2 id="jobTitle">Loading...</h2>
+                <span class="mode-badge voice-badge">Voice Mode</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <div class="timer" id="timer">10:00</div>
+            <button class="end-btn" onclick="endInterview()">End Interview</button>
+        </div>
+    </header>
+
+    <div class="voice-interview-layout">
+        <!-- Left: Conversation transcript -->
+        <div class="conversation-display">
+            <div class="conversation-messages" id="conversationMessages">
+                <div class="welcome-message-voice">
+                    <div class="welcome-icon">👋</div>
+                    <h3>Welcome to Your AI Interview</h3>
+                    <p>Click <strong>Start Interview</strong> to begin your voice session</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Camera + Avatar -->
+        <div class="media-panel">
+            <div class="camera-section">
+                <div class="camera-container" id="cameraContainer">
+                    <video id="cameraPreview" autoplay playsinline muted></video>
+                    <div class="camera-overlay" id="cameraOverlay">
+                        <div class="camera-icon">📷</div>
+                        <p>Camera Preview</p>
+                        <button class="enable-camera-btn" onclick="enableCamera()">Enable Camera</button>
+                    </div>
+                    <button class="toggle-camera-btn" id="toggleCameraBtn" onclick="toggleCamera()" style="display:none">
+                        <span id="cameraToggleIcon">🚫</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="avatar-section-compact">
+                <div class="avatar-wrapper" id="avatarWrapper">
+                    <div class="avatar" id="avatar">
+                        <div class="avatar-face">🎙️</div>
+                        <div class="pulse-ring"></div>
+                        <div class="pulse-ring delayed"></div>
+                    </div>
+                    <div class="avatar-status" id="avatarStatus">Ready</div>
+                </div>
+                <div class="start-button-wrapper" id="startWrapper">
+                    <button class="start-interview-btn" id="startBtn" onclick="startInterview()">
+                        <span class="btn-icon">🎤</span>
+                        Start Interview
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Feedback Modal -->
+<div class="modal feedback-modal" id="feedbackModal">
+    <div class="modal-content feedback-content">
+        <div class="feedback-header"><h2>📊 Interview Feedback</h2></div>
+        <div class="feedback-body" id="feedbackBody">
+            <div class="loading-feedback">
+                <div class="spinner"></div>
+                <p>Analyzing your performance…</p>
+            </div>
+        </div>
+        <div class="feedback-actions">
+            <button class="btn-secondary" onclick="goHome()">Back to Home</button>
+            <button class="btn-primary" onclick="retakeInterview()">Retake Interview</button>
+        </div>
+    </div>
+</div>
+
+<script src="env.js"></script>
+<script src="config.js"></script>
+<script src="api-client.js"></script>
+<script src="memory-manager.js"></script>
+<script src="voice-mode.js"></script>
+</body>
+</html>

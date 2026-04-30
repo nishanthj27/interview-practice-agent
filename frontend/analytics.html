@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - Interview Practice Partner</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ── Dashboard layout ──────────────────────── */
+        .dashboard-wrap { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+        .dash-header { display:flex; justify-content:space-between; align-items:center; margin-bottom: 2rem; }
+        .dash-header h1 { font-size: 1.8rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+        .stat-card { background: var(--bg-secondary); border: 1.5px solid var(--border-color); border-radius: 14px; padding: 1.5rem; text-align: center; }
+        .stat-card .stat-val { font-size: 2.5rem; font-weight: 800; color: var(--primary-color); }
+        .stat-card .stat-label { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.25rem; }
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+        @media(max-width:768px){ .charts-grid { grid-template-columns:1fr; } }
+        .chart-card { background: var(--bg-secondary); border: 1.5px solid var(--border-color); border-radius: 14px; padding: 1.5rem; }
+        .chart-card h3 { margin-bottom: 1rem; font-size: 1rem; color: var(--text-secondary); }
+        .bar-chart { display: flex; flex-direction: column; gap: 0.6rem; }
+        .bar-row { display: flex; align-items: center; gap: 0.75rem; }
+        .bar-row-label { width: 120px; font-size: 0.8rem; color: var(--text-secondary); flex-shrink:0; white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+        .bar-track { flex:1; height:10px; background: var(--bg-tertiary); border-radius:99px; overflow:hidden; }
+        .bar-fill { height:100%; border-radius:99px; transition: width 0.8s ease; }
+        .bar-val { width: 36px; text-align:right; font-size:0.8rem; font-weight:700; color:var(--text-primary); }
+        .sessions-table { width:100%; border-collapse:collapse; }
+        .sessions-table th, .sessions-table td { text-align:left; padding:0.75rem 1rem; border-bottom:1px solid var(--border-color); font-size:0.85rem; }
+        .sessions-table th { color: var(--text-secondary); font-weight:600; }
+        .grade-pill { display:inline-block; padding:0.2rem 0.6rem; border-radius:99px; font-size:0.8rem; font-weight:700; }
+        .grade-A { background:#d1fae5; color:#065f46; }
+        .grade-B { background:#dbeafe; color:#1e40af; }
+        .grade-C { background:#fef3c7; color:#92400e; }
+        .grade-D,.grade-F { background:#fee2e2; color:#991b1b; }
+        .no-data { text-align:center; padding: 3rem; color: var(--text-secondary); }
+        .no-data span { font-size: 3rem; display:block; margin-bottom:1rem; }
+        .topic-weak { display:inline-block; background:var(--bg-tertiary); border:1px solid var(--border-color); border-radius:8px; padding:0.3rem 0.8rem; margin:0.25rem; font-size:0.8rem; }
+        .topic-weak.weak { border-color: #ef4444; color: #ef4444; }
+        .topic-weak.strong { border-color: #10b981; color: #10b981; }
+        .clear-btn { background:transparent; border:1.5px solid #ef4444; color:#ef4444; padding:0.5rem 1rem; border-radius:8px; cursor:pointer; font-size:0.85rem; }
+        .clear-btn:hover { background:#fee2e2; }
+        .donut-wrap { position:relative; width:140px; height:140px; margin:0 auto 1rem; }
+        .donut-svg { transform: rotate(-90deg); }
+        .donut-track { fill:none; stroke:var(--bg-tertiary); stroke-width:16; }
+        .donut-fill  { fill:none; stroke-width:16; stroke-linecap:round; transition:stroke-dasharray 1s ease; }
+        .donut-label { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center; }
+        .donut-label .dl-score { font-size:1.8rem; font-weight:800; }
+        .donut-label .dl-text  { font-size:0.65rem; color:var(--text-secondary); }
+    </style>
+</head>
+<body>
+<div class="dashboard-wrap">
+    <div class="dash-header">
+        <div>
+            <h1>📊 Analytics Dashboard</h1>
+            <p style="color:var(--text-secondary);font-size:0.9rem">Your interview performance history</p>
+        </div>
+        <div style="display:flex;gap:0.75rem">
+            <button class="clear-btn" onclick="clearData()">🗑 Clear Data</button>
+            <a href="index.html" class="btn-primary" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;padding:0.6rem 1.2rem;border-radius:8px;font-size:0.9rem">← Back to Home</a>
+        </div>
+    </div>
+
+    <div id="dashboardContent"></div>
+</div>
+
+<script src="env.js"></script>
+<script src="config.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', renderDashboard);
+
+function renderDashboard() {
+    const sessions = getSessions();
+    const container = document.getElementById('dashboardContent');
+
+    if (!sessions.length) {
+        container.innerHTML = `
+            <div class="no-data">
+                <span>📭</span>
+                <h3>No interview sessions yet</h3>
+                <p>Complete at least one interview to see your analytics.</p>
+                <a href="index.html" class="btn-primary" style="display:inline-block;margin-top:1rem;text-decoration:none;padding:0.75rem 1.5rem;border-radius:8px">Start an Interview</a>
+            </div>`;
+        return;
+    }
+
+    const stats = computeStats(sessions);
+    container.innerHTML = renderStats(stats) + renderCharts(stats, sessions) + renderTable(sessions);
+    animateBars();
+}
+
+function getSessions() {
+    try {
+        return JSON.parse(localStorage.getItem(CONFIG.ANALYTICS_KEY) || '[]').reverse();
+    } catch { return []; }
+}
+
+function computeStats(sessions) {
+    const scores   = sessions.map(s => s.totalScore || 0).filter(Boolean);
+    const avgScore = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : 0;
+    const best     = scores.length ? Math.max(...scores) : 0;
+
+    const jobCounts = {};
+    const jobScores = {};
+    sessions.forEach(s => {
+        jobCounts[s.jobTitle] = (jobCounts[s.jobTitle] || 0) + 1;
+        if (!jobScores[s.jobTitle]) jobScores[s.jobTitle] = [];
+        jobScores[s.jobTitle].push(s.totalScore || 0);
+    });
+
+    const jobAvg = {};
+    Object.keys(jobScores).forEach(j => {
+        const arr = jobScores[j];
+        jobAvg[j] = Math.round(arr.reduce((a,b)=>a+b,0)/arr.length);
+    });
+
+    // Category aggregation
+    const catTotals = { communication:0, technical:0, problemSolving:0, professionalism:0 };
+    const catCount  = { communication:0, technical:0, problemSolving:0, professionalism:0 };
+    sessions.forEach(s => {
+        const fb = s._lastFeedback;
+        // Try to get from per-session answers
+    });
+
+    // Trend: last 5 scores
+    const trend = sessions.slice(0,5).map(s=>s.totalScore||0).reverse();
+
+    return { avgScore, best, total: sessions.length, jobAvg, jobCounts, trend };
+}
+
+function renderStats(s) {
+    const streak = computeStreak();
+    return `
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-val">${s.total}</div>
+            <div class="stat-label">Total Interviews</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val" style="color:${s.avgScore>=70?'#10b981':s.avgScore>=50?'#f59e0b':'#ef4444'}">${s.avgScore}</div>
+            <div class="stat-label">Average Score</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val" style="color:#10b981">${s.best}</div>
+            <div class="stat-label">Best Score</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-val" style="color:#6366f1">${streak}</div>
+            <div class="stat-label">Day Streak 🔥</div>
+        </div>
+    </div>`;
+}
+
+function renderCharts(stats, sessions) {
+    // Job performance bars
+    const jobBars = Object.entries(stats.jobAvg)
+        .sort((a,b)=>b[1]-a[1])
+        .map(([job, avg]) => `
+            <div class="bar-row">
+                <span class="bar-row-label" title="${job}">${job}</span>
+                <div class="bar-track"><div class="bar-fill" data-width="${avg}" style="width:0%;background:${avg>=70?'#10b981':avg>=50?'#f59e0b':'#ef4444'}"></div></div>
+                <span class="bar-val">${avg}</span>
+            </div>`).join('');
+
+    // Trend
+    const trendData = stats.trend;
+    const trendHTML = trendData.map((s,i) => `
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0.3rem;flex:1">
+            <div style="height:80px;display:flex;align-items:flex-end">
+                <div style="width:24px;background:${s>=70?'#10b981':s>=50?'#f59e0b':'#ef4444'};border-radius:4px 4px 0 0;height:${s}%;min-height:4px;transition:height 0.8s ease"></div>
+            </div>
+            <span style="font-size:0.75rem;font-weight:700">${s}</span>
+            <span style="font-size:0.65rem;color:var(--text-secondary)">#${i+1}</span>
+        </div>`).join('');
+
+    // Donut for avg
+    const avg = stats.avgScore;
+    const circ = 2 * Math.PI * 50;
+    const filled = (avg / 100) * circ;
+    const color = avg>=70?'#10b981':avg>=50?'#f59e0b':'#ef4444';
+
+    return `
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>Performance by Role</h3>
+            <div class="bar-chart">${jobBars || '<p style="color:var(--text-secondary)">No data yet.</p>'}</div>
+        </div>
+        <div class="chart-card">
+            <h3>Recent Score Trend (Last 5)</h3>
+            <div style="display:flex;align-items:flex-end;height:100px;gap:0.25rem;padding:0 1rem">
+                ${trendHTML || '<p style="color:var(--text-secondary)">No data yet.</p>'}
+            </div>
+        </div>
+        <div class="chart-card" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <h3 style="text-align:center">Overall Progress</h3>
+            <div class="donut-wrap">
+                <svg class="donut-svg" viewBox="0 0 120 120" width="140" height="140">
+                    <circle class="donut-track" cx="60" cy="60" r="50"/>
+                    <circle class="donut-fill" cx="60" cy="60" r="50"
+                        stroke="${color}"
+                        stroke-dasharray="${filled} ${circ}"
+                        stroke-dashoffset="0"/>
+                </svg>
+                <div class="donut-label">
+                    <div class="dl-score" style="color:${color}">${avg}</div>
+                    <div class="dl-text">avg score</div>
+                </div>
+            </div>
+        </div>
+        <div class="chart-card">
+            <h3>Interview Count by Role</h3>
+            <div class="bar-chart">${
+                Object.entries(stats.jobCounts)
+                    .sort((a,b)=>b[1]-a[1])
+                    .map(([job, count]) => `
+                        <div class="bar-row">
+                            <span class="bar-row-label">${job}</span>
+                            <div class="bar-track"><div class="bar-fill" data-width="${Math.min(count*10,100)}" style="width:0%;background:#6366f1"></div></div>
+                            <span class="bar-val">${count}x</span>
+                        </div>`).join('') || '<p style="color:var(--text-secondary)">No data</p>'
+            }</div>
+        </div>
+    </div>`;
+}
+
+function renderTable(sessions) {
+    const rows = sessions.slice(0, 20).map(s => {
+        const date  = new Date(s.startTime).toLocaleDateString();
+        const score = s.totalScore || 0;
+        const grade = score>=85?'A':score>=70?'B':score>=55?'C':score>=40?'D':'F';
+        const dur   = s.endTime ? Math.round((new Date(s.endTime)-new Date(s.startTime))/60000) : '—';
+        const mode  = s.mode === 'voice' ? '🎤 Voice' : '💬 Chat';
+        const diff  = s.difficulty || 'intermediate';
+        return `
+        <tr>
+            <td>${date}</td>
+            <td>${s.jobTitle || '—'}</td>
+            <td>${mode}</td>
+            <td>${diff}</td>
+            <td><span class="grade-pill grade-${grade}">${grade} · ${score}/100</span></td>
+            <td>${s.questionCount || 0} Qs</td>
+            <td>${dur} min</td>
+        </tr>`;
+    }).join('');
+
+    return `
+    <div class="chart-card" style="overflow-x:auto">
+        <h3 style="margin-bottom:1rem">Session History</h3>
+        <table class="sessions-table">
+            <thead><tr>
+                <th>Date</th><th>Role</th><th>Mode</th><th>Level</th>
+                <th>Score</th><th>Questions</th><th>Duration</th>
+            </tr></thead>
+            <tbody>${rows}</tbody>
+        </table>
+    </div>`;
+}
+
+function computeStreak() {
+    try {
+        const sessions = getSessions().reverse();
+        if (!sessions.length) return 0;
+        const dates = [...new Set(sessions.map(s => new Date(s.startTime).toDateString()))];
+        let streak = 0;
+        let check = new Date();
+        for (const d of dates.slice().reverse()) {
+            if (new Date(d).toDateString() === check.toDateString()) {
+                streak++;
+                check.setDate(check.getDate() - 1);
+            } else break;
+        }
+        return streak;
+    } catch { return 0; }
+}
+
+function animateBars() {
+    setTimeout(() => {
+        document.querySelectorAll('.bar-fill[data-width]').forEach(el => {
+            el.style.width = el.dataset.width + '%';
+        });
+    }, 100);
+}
+
+function clearData() {
+    if (confirm('Clear all analytics data? This cannot be undone.')) {
+        localStorage.removeItem(CONFIG.ANALYTICS_KEY);
+        renderDashboard();
+    }
+}
+</script>
+</body>
+</html>

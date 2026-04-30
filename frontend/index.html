@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Practice Partner — AI-Powered Mock Interviews</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <header class="main-header">
+        <div class="header-brand">
+            <span class="brand-icon">🎯</span>
+            <div>
+                <h1>Interview Practice Partner</h1>
+                <p class="subtitle">AI-powered mock interviews with real-time scoring</p>
+            </div>
+        </div>
+        <a href="analytics.html" class="analytics-link">📊 My Analytics</a>
+    </header>
+
+    <div class="job-grid" id="jobGrid"></div>
+
+    <footer class="main-footer">
+        <p>Powered by Gemini AI &nbsp;•&nbsp; Practice makes perfect &nbsp;•&nbsp;
+           <a href="analytics.html" style="color:var(--primary-color)">View Analytics</a>
+        </p>
+    </footer>
+</div>
+
+<!-- ── 1. User Info Modal ───────────────────────────────────── -->
+<div class="modal" id="userInfoModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>📝 Your Profile</h2>
+            <p class="job-title-display" id="infoJobTitle"></p>
+        </div>
+        <form id="userInfoForm" class="user-info-form">
+            <div class="form-group">
+                <label>Full Name <span class="required">*</span></label>
+                <input type="text" name="fullName" placeholder="Your full name" required minlength="2">
+            </div>
+            <div class="form-group">
+                <label>Organization / College <span class="required">*</span></label>
+                <input type="text" name="organization" placeholder="Your organization or institution" required minlength="2">
+            </div>
+            <div class="form-group">
+                <label>Degree with Major <span class="required">*</span></label>
+                <input type="text" name="degree" placeholder="e.g. B.Tech in Computer Science" required minlength="2">
+            </div>
+            <div class="form-group">
+                <label>Current Role <span class="required">*</span></label>
+                <input type="text" name="currentRole" placeholder='e.g. Software Engineer or "Student"' required minlength="2">
+                <small class="form-hint">Type "Student" if you're currently studying</small>
+            </div>
+            <!-- Resume upload -->
+            <div class="form-group">
+                <label>Upload Resume (Optional)</label>
+                <label class="resume-upload-btn" for="resumeFile">
+                    📎 Choose Resume (.txt / .pdf text)
+                </label>
+                <input type="file" id="resumeFile" accept=".txt,.pdf,.doc,.docx" style="display:none">
+                <span id="resumeLabel" style="font-size:0.8rem;color:var(--text-secondary);display:block;margin-top:0.3rem">No file selected — questions will be personalized if uploaded</span>
+            </div>
+            <div class="instructions-box">
+                <h3>📋 Guidelines</h3>
+                <ul class="instructions-list">
+                    <li><strong>🚫 No AI Tools:</strong> Use only your own knowledge.</li>
+                    <li><strong>🔇 Quiet Environment:</strong> Especially for voice mode.</li>
+                    <li><strong>💪 Be Authentic:</strong> Treat it as a real interview.</li>
+                </ul>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="closeUserInfoModal()">Cancel</button>
+                <button type="submit" class="btn-primary">Next: Settings →</button>
+            </div>
+        </form>
+        <button class="close-modal" onclick="closeUserInfoModal()">✕</button>
+    </div>
+</div>
+
+<!-- ── 2. Interview Settings Modal ─────────────────────────── -->
+<div class="modal" id="settingsModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>⚙️ Interview Settings</h2>
+            <p class="job-title-display" id="settingsJobTitle"></p>
+        </div>
+
+        <div class="settings-section">
+            <h3>📊 Difficulty Level</h3>
+            <div class="option-cards" id="difficultyCards">
+                <label class="option-card">
+                    <input type="radio" name="difficulty" value="beginner">
+                    <div class="option-card-inner">
+                        <span class="opt-icon">🌱</span>
+                        <strong>Beginner</strong>
+                        <span>Entry-level / fresher</span>
+                    </div>
+                </label>
+                <label class="option-card">
+                    <input type="radio" name="difficulty" value="intermediate" checked>
+                    <div class="option-card-inner">
+                        <span class="opt-icon">⚡</span>
+                        <strong>Intermediate</strong>
+                        <span>1–3 years experience</span>
+                    </div>
+                </label>
+                <label class="option-card">
+                    <input type="radio" name="difficulty" value="advanced">
+                    <div class="option-card-inner">
+                        <span class="opt-icon">🔥</span>
+                        <strong>Advanced</strong>
+                        <span>3+ years / senior</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3>🎭 Interviewer Personality</h3>
+            <div class="option-cards">
+                <label class="option-card">
+                    <input type="radio" name="personality" value="friendly">
+                    <div class="option-card-inner">
+                        <span class="opt-icon">😊</span>
+                        <strong>Friendly</strong>
+                        <span>Warm &amp; encouraging</span>
+                    </div>
+                </label>
+                <label class="option-card">
+                    <input type="radio" name="personality" value="neutral" checked>
+                    <div class="option-card-inner">
+                        <span class="opt-icon">🎯</span>
+                        <strong>Neutral</strong>
+                        <span>Professional tone</span>
+                    </div>
+                </label>
+                <label class="option-card">
+                    <input type="radio" name="personality" value="tough">
+                    <div class="option-card-inner">
+                        <span class="opt-icon">💼</span>
+                        <strong>Tough</strong>
+                        <span>High-pressure, challenging</span>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn-secondary" onclick="closeSettingsModal()">← Back</button>
+            <button class="btn-primary" onclick="confirmSettings()">Choose Mode →</button>
+        </div>
+        <button class="close-modal" onclick="closeSettingsModal()">✕</button>
+    </div>
+</div>
+
+<!-- ── 3. Mode Selection Modal ──────────────────────────────── -->
+<div class="modal" id="modeModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Choose Interview Mode</h2>
+            <p class="job-title-display" id="selectedJobTitle"></p>
+        </div>
+        <div class="mode-options">
+            <div class="mode-card" onclick="selectMode('chat')">
+                <div class="mode-icon">💬</div>
+                <h3>Chat Mode</h3>
+                <p>Text-based interview with real-time answer scoring</p>
+                <button class="mode-btn">Start Chat Interview</button>
+            </div>
+            <div class="mode-card" onclick="selectMode('voice')">
+                <div class="mode-icon">🎤</div>
+                <h3>Voice Mode</h3>
+                <p>Speak your answers — natural voice conversation</p>
+                <button class="mode-btn">Start Voice Interview</button>
+            </div>
+        </div>
+        <button class="close-modal" onclick="closeModeSelectorModal()">✕</button>
+    </div>
+</div>
+
+<script src="env.js"></script>
+<script src="config.js"></script>
+<script src="api-client.js"></script>
+<script src="memory-manager.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

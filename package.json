@@ -1,0 +1,12 @@
+{
+  "name": "interview-practice-partner",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static frontend deployment wrapper for Interview Practice Partner",
+  "scripts": {
+    "build": "node scripts/build-frontend.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

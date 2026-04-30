@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: interview-practice-partner-backend
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://interview-practice-partner.vercel.app
+      - key: CORS_ORIGINS
+        value: https://interview-practice-partner.vercel.app,https://*.vercel.app
+      - key: GEMINI_API_KEY
+        sync: false
