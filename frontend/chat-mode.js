@@ -63,7 +63,7 @@ async function startInterview() {
         memoryManager.addMessage('assistant', message);
         addMessage('bot', message);
     } catch (e) {
-        const fallback = 'I could not connect to the interview backend. Please check the deployed backend URL and try again.';
+        const fallback = 'The API is exhausted or not responding. Please try again later.';
         addMessage('bot', fallback);
         console.error(e);
     } finally {
@@ -120,7 +120,7 @@ async function sendMessage() {
             memoryManager.addMessage('assistant', nextMsg);
             addMessage('bot', nextMsg);
         } else {
-            addMessage('bot', 'I had a connection issue. Could you repeat that?');
+            addMessage('bot', 'The API is exhausted or not responding. Please try again later.');
         }
 
     } catch (e) {

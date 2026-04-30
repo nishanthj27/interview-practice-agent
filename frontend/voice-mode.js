@@ -108,7 +108,7 @@ async function startInterview() {
         addConversationMessage('bot', message);
         speak(message);
     } catch (e) {
-        const fallback = 'I could not connect to the interview backend. Please check the deployed backend URL and try again.';
+        const fallback = 'The API is exhausted or not responding. Please try again later.';
         addConversationMessage('bot', fallback);
         speak(fallback);
         console.error(e);
@@ -155,7 +155,7 @@ async function handleUserSpeech(transcript) {
         speak(nextMsg);
     } catch (e) {
         console.error(e);
-        const errMsg = 'I had a brief connection issue. Could you repeat that?';
+        const errMsg = 'The API is exhausted or not responding. Please try again later.';
         addConversationMessage('bot', errMsg);
         speak(errMsg);
     } finally {
