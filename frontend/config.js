@@ -14,7 +14,7 @@ function getDefaultApiBaseUrl() {
     if (localHosts.includes(window.location.hostname)) {
         return 'http://localhost:3001';
     }
-    return 'https://interview-practice-partner-backend.onrender.com';
+    return '';
 }
 
 const CONFIG = {

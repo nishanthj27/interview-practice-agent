@@ -7,8 +7,11 @@ const root = path.resolve(__dirname, '..');
 const sourceDir = path.join(root, 'frontend');
 const outputDir = path.join(root, 'dist');
 
-const defaultApiUrl = 'https://interview-practice-partner-backend.onrender.com';
-const apiBaseUrl = (process.env.API_BASE_URL || defaultApiUrl).replace(/\/+$/, '');
+const apiBaseUrl = (process.env.API_BASE_URL || '').replace(/\/+$/, '');
+
+if (process.env.VERCEL === '1' && !apiBaseUrl) {
+  throw new Error('API_BASE_URL is required for Vercel builds. Set it to your Render backend URL.');
+}
 
 function copyDirectory(source, destination) {
   fs.mkdirSync(destination, { recursive: true });

@@ -103,6 +103,8 @@ API_BASE_URL=https://your-render-service.onrender.com
 
 Use the real Render URL from step 2.
 
+Do not leave `API_BASE_URL` empty. The frontend needs this value at build time so it can call your Render backend.
+
 Then click `Deploy`.
 
 After Vercel finishes, copy your frontend URL. It will look like:
@@ -148,6 +150,8 @@ If the home page loads but jobs do not appear, check:
 - Render backend is awake. Free Render services can sleep after inactivity.
 - Render `GEMINI_API_KEY` is set.
 - Render `CORS_ORIGINS` includes your Vercel URL.
+
+If the interview starts but does not use the profile information you entered, the frontend is not reaching the backend chat endpoint. Check Vercel `API_BASE_URL`, Render logs, and the browser console/network tab.
 
 ## 6. Auto Deploys
 

@@ -63,10 +63,9 @@ async function startInterview() {
         memoryManager.addMessage('assistant', message);
         addMessage('bot', message);
     } catch (e) {
-        const fallback = `Welcome! I'm your ${currentJob.title} interviewer. Please introduce yourself.`;
-        lastQuestion = fallback;
+        const fallback = 'I could not connect to the interview backend. Please check the deployed backend URL and try again.';
         addMessage('bot', fallback);
-        memoryManager.addMessage('assistant', fallback);
+        console.error(e);
     } finally {
         showTyping(false);
     }
